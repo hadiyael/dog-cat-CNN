@@ -20,9 +20,9 @@ if uploaded_file is not None:
     st.image(image, caption="Uploaded Image", use_column_width=True)
 
     # Preprocess Image
-    image = image.resize((32, 32))  # Adjust to your model's input size
-    image_array = np.array(image) / 255.0  # Normalize (if needed)
-    image_array = np.expand_dims(image_array, axis=0)  # Add batch dimension
+    image = image.resize((360,400))  
+    image_array = np.array(image) / 255.0  
+    image_array = np.expand_dims(image_array, axis=0) 
 
     # Predict
     prediction = model.predict(image_array)
