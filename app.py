@@ -17,7 +17,7 @@ if uploaded_file is not None:
         x = np.expand_dims(x, axis=0)
         x = preprocess_input(x)
 
-        preds = model_vgg.predict(x)
+        preds = model.predict(x)
         predicted_class = "Dog" if preds[0][0] > 0.5 else "Cat"  # Adjust threshold if necessary
 
         st.image(img, caption=f"Uploaded Image", use_column_width=True)
