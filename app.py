@@ -3,12 +3,12 @@ import tensorflow as tf
 import numpy as np
 from PIL import Image
 from tensorflow.keras.preprocessing import image
-from tensorflow.keras.applications.vgg16 import preprocess_input, decode_predictions
+from tensorflow.keras.applications.vgg16 import preprocess_input
 
 # Load the pre-trained VGG model from the saved .keras file
 model_vgg = tf.keras.models.load_model('cat_dog_final_model.keras')
 
-# Define class names for the prediction (modify if necessary)
+# Define class names for the prediction (Cat and Dog)
 class_names = ["Cat", "Dog"]
 
 # Streamlit UI
@@ -35,10 +35,9 @@ if uploaded_file is not None:
     # Predict the class of the image
     preds = model_vgg.predict(x)
 
-    # Decode predictions to get the class label and the probability
-    decoded_preds = decode_predictions(preds, top=1)[0]
-    predicted_class = decoded_preds[0][1]
-    confidence = decoded_preds[0][2]
+    # Since there are only two classes (Cat and Dog), directly check the prediction
+    predicted_class = class_names[np.argmax(preds)]
+    confidence = np.max(preds)
 
     # Display the prediction result and confidence
     st.write(f"Prediction: **{predicted_class}**")
