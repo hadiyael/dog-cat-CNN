@@ -1,44 +1,43 @@
 import streamlit as st
 import tensorflow as tf
+from tensorflow.keras.preprocessing import image
 import numpy as np
 from PIL import Image
-from tensorflow.keras.preprocessing import image
-from tensorflow.keras.applications.vgg16 import preprocess_input
 
-# Load the pre-trained VGG model from the saved .keras file
-model_vgg = tf.keras.models.load_model('cat_dog_final_model.keras')
+# Load the trained model
+model = tf.keras.models.load_model('cat_dog_final_model.keras')
 
-# Define class names for the prediction (Cat and Dog)
-class_names = ["Cat", "Dog"]
+# Define a function to preprocess the uploaded image
+def preprocess_image(img):
+    img = img.resize((360, 400))  # Resize to the shape your model expects
+    img_array = np.array(img)  # Convert image to numpy array
+    img_array = img_array / 255.0  # Normalize the image (as done in training)
+    img_array = np.expand_dims(img_array, axis=0)  # Add batch dimension
+    return img_array
 
-# Streamlit UI
-st.title("Cat vs. Dog Classifier 🐱🐶")
+# Streamlit app layout
+st.title("Cat vs Dog Classification")
+st.write("Upload an image of a cat or a dog, and the model will predict which one it is!")
 
-# File uploader for the user to upload an image
-uploaded_file = st.file_uploader("Upload an image", type=["jpg", "png", "jpeg"])
+# Upload image
+uploaded_image = st.file_uploader("Choose an image", type=["jpg", "jpeg", "png"])
 
-if uploaded_file is not None:
-    # Open and display the uploaded image
-    image = Image.open(uploaded_file).convert("RGB")
-    st.image(image, caption="Uploaded Image", use_column_width=True)
+# If an image is uploaded, display it and make predictions
+if uploaded_image is not None:
+    # Open the uploaded image and display it
+    img = Image.open(uploaded_image)
+    st.image(img, caption="Uploaded Image", use_column_width=True)
 
-    # Preprocess the image (resize to match the model's input size)
-    img = image.resize((400, 360))  # Resize to the expected input size (Width=400, Height=360)
-    x = np.array(img)
-    x = np.expand_dims(x, axis=0)
-    x = preprocess_input(x)  # Preprocess image as per VGG16 requirements
+    # Preprocess the image
+    img_array = preprocess_image(img)
 
-    # Check shape and value range of the image array
-    st.write(f"Image array shape: {x.shape}")
-    st.write(f"Image array range: {np.min(x)} to {np.max(x)}")
+    # Make prediction
+    prediction = model.predict(img_array)
+    
+    # Display prediction result
+    if prediction[0] > 0.5:
+        st.write("Prediction: Dog 🐶")
+    else:
+        st.write("Prediction: Cat 🐱")
 
-    # Predict the class of the image
-    preds = model_vgg.predict(x)
-
-    # Since there are only two classes (Cat and Dog), directly check the prediction
-    predicted_class = class_names[np.argmax(preds)]
-    confidence = np.max(preds)
-
-    # Display the prediction result and confidence
-    st.write(f"Prediction: **{predicted_class}**")
-    st.write(f"Confidence: **{confidence:.2f}")
+# Run the Streamlit app by saving the file and running: `streamlit run app.py`
