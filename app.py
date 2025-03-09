@@ -4,12 +4,7 @@ import numpy as np
 from PIL import Image
 import gdown
 
-model_url = "https://github.com/hadiyael/dog-cat-CNN/blob/main/cat_dog_final_model.keras"
-
-# Download the model to the local environment
-gdown.download(model_url, "cat_dog_final_model.keras", quiet=False)
-# Load the trained model
-model = tf.keras.models.load_model("cat_dog_final_model.keras")
+model = tf.keras.models.load_model('cat_dog_final_model.keras')
 
 # Define class names
 class_names = ["Cat", "Dog"]
