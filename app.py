@@ -32,11 +32,11 @@ if uploaded_file is not None:
     # Predict the class of the image
     prediction = model.predict(image_array)
     
-    # Check the output of the model
-    st.write(f"Model raw output: {prediction}")
+    # Check the output of the model (raw output)
+    st.write(f"Model raw output (logits): {prediction}")
 
     # Ensure the prediction is a probability (if not already)
-    prediction_prob = tf.nn.softmax(prediction).numpy()  # Apply softmax to get probabilities
+    prediction_prob = tf.nn.softmax(prediction, axis=-1).numpy()  # Apply softmax to get probabilities
     st.write(f"Prediction probabilities: {prediction_prob}")
 
     # Get class index and confidence
