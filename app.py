@@ -2,20 +2,33 @@ import streamlit as st
 import tensorflow as tf
 import numpy as np
 from PIL import Image
-import requests
-import gdown
 
+# Load the trained model
+model = tf.keras.models.load_model("cat_dog_final_model.keras")
 
-@st.cache_resource
-def load_model():
-    url = "https://drive.google.com/1mJCFadc75OkuX5YfM_dbE7lqsWHgEJ7Z"
-    output = "cat_dog_final_model.keras"
-    gdown.download(url, output, quiet=False)
-    
-    model = tf.keras.models.load_model(output)
-    return model
+# Define class names
+class_names = ["Cat", "Dog"]
 
-# Charger le modèle une seule fois
-model = load_model()
+# Streamlit UI
+st.title("Cat vs. Dog Classifier 🐱🐶")
 
-st.write("Modèle chargé avec succès !")
+# Upload Image
+uploaded_file = st.file_uploader("Upload an image", type=["jpg", "png", "jpeg"])
+
+if uploaded_file is not None:
+    image = Image.open(uploaded_file).convert("RGB")
+    st.image(image, caption="Uploaded Image", use_column_width=True)
+
+    # Preprocess Image
+    image = image.resize((32, 32))  # Adjust to your model's input size
+    image_array = np.array(image) / 255.0  # Normalize (if needed)
+    image_array = np.expand_dims(image_array, axis=0)  # Add batch dimension
+
+    # Predict
+    prediction = model.predict(image_array)
+    class_index = np.argmax(prediction)
+    confidence = np.max(prediction)
+
+    # Display Result
+    st.write(f"Prediction: **{class_names[class_index]}**")
+    st.write(f"Confidence: **{confidence:.2f}**")
