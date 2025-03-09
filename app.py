@@ -89,8 +89,3 @@ if uploaded_image is not None:
         st.markdown("<div class='prediction-container'><h2>Dog 🐶</h2></div>", unsafe_allow_html=True)
     else:
         st.markdown("<div class='prediction-container'><h2>Cat 🐱</h2></div>", unsafe_allow_html=True)
-
-    st.markdown(f"<div class='probability-container'>Prediction Probability: {prediction[0][0]*100:.2f}%</div>", unsafe_allow_html=True)
-
-    if st.button('Upload another image', key='reset'):
-        st.experimental_rerun()
