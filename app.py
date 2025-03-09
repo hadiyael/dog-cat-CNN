@@ -6,43 +6,24 @@ from PIL import Image
 # Load the pre-trained model
 model = tf.keras.models.load_model('cat_dog_final_model.keras')
 
-# Define class names for the prediction
-class_names = ["Cat", "Dog"]
+st.title("Cat vs Dog Image Classifier")
 
-# Streamlit UI
-st.title("Cat vs. Dog Classifier 🐱🐶")
-
-# File uploader for the user to upload an image
-uploaded_file = st.file_uploader("Upload an image", type=["jpg", "png", "jpeg"])
+uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
 
 if uploaded_file is not None:
-    # Open and display the uploaded image
-    image = Image.open(uploaded_file).convert("RGB")
-    st.image(image, caption="Uploaded Image", use_column_width=True)
+    try:
+        img = image.load_img(uploaded_file, target_size=(360, 400)) # Ensure target size matches training
+        x = image.img_to_array(img)
+        x = np.expand_dims(x, axis=0)
+        x = preprocess_input(x)
 
-    # Preprocess the image
-    image_resized = image.resize((400, 360))  # Resize to the expected input size (Width=400, Height=360)
-    image_array = np.array(image_resized) / 255.0  # Normalize the image
-    image_array = np.expand_dims(image_array, axis=0)  # Add batch dimension
+        preds = model_vgg.predict(x)
+        predicted_class = "Dog" if preds[0][0] > 0.5 else "Cat"  # Adjust threshold if necessary
 
-    # Check shape and value range of the image array
-    st.write(f"Image array shape: {image_array.shape}")
-    st.write(f"Image array range: {np.min(image_array)} to {np.max(image_array)}")
+        st.image(img, caption=f"Uploaded Image", use_column_width=True)
+        st.write(f"Prediction: {predicted_class}")
 
-    # Predict the class of the image
-    prediction = model.predict(image_array)
-    
-    # Check the output of the model (raw output)
-    st.write(f"Model raw output (logits): {prediction}")
-
-    # Ensure the prediction is a probability (if not already)
-    prediction_prob = tf.nn.softmax(prediction, axis=-1).numpy()  # Apply softmax to get probabilities
-    st.write(f"Prediction probabilities: {prediction_prob}")
-
-    # Get class index and confidence
-    class_index = np.argmax(prediction_prob)
-    confidence = prediction_prob[0][class_index]
-
-    # Display the prediction result and confidence
-    st.write(f"Prediction: **{class_names[class_index]}**")
-    st.write(f"Confidence: **{confidence:.2f}**")
+    except Exception as e:
+        st.error(f"Error during prediction: {e}")
+else:
+    st.write("Please upload an image.")
