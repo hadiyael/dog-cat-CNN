@@ -9,7 +9,7 @@ model = tf.keras.models.load_model('cat_dog_final_model.keras')
 
 # Define a function to preprocess the uploaded image
 def preprocess_image(img):
-    img = img.resize((360, 400))  # Resize to the shape your model expects
+    img = img.resize((400, 360))  # Resize to the correct shape (width, height)
     img_array = np.array(img)  # Convert image to numpy array
     img_array = img_array / 255.0  # Normalize the image (as done in training)
     img_array = np.expand_dims(img_array, axis=0)  # Add batch dimension
